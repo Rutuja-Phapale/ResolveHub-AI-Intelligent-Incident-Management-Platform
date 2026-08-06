@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: resolvehub-postgres
+    environment:
+      POSTGRES_DB: resolvehub_ai
+      POSTGRES_USER: resolvehub_user
+      POSTGRES_PASSWORD: resolvehub_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - resolvehub_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  resolvehub_postgres_data:
