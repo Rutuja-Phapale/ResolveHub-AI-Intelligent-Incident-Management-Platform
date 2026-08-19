@@ -6,10 +6,14 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.resolvehub.ticket.application.exception.TicketNotFoundException;
+import com.resolvehub.ticket.application.exception.UserNotFoundException;
 import com.resolvehub.ticket.infrastructure.persistence.TicketEntity;
 import com.resolvehub.ticket.infrastructure.persistence.TicketRepository;
+import com.resolvehub.ticket.web.dto.AssignTicketRequest;
 import com.resolvehub.ticket.web.dto.CreateTicketRequest;
 import com.resolvehub.ticket.web.dto.TicketResponse;
+import com.resolvehub.ticket.web.dto.UpdateTicketRequest;
 import com.resolvehub.user.infrastructure.persistence.UserEntity;
 import com.resolvehub.user.infrastructure.persistence.UserRepository;
 
@@ -31,7 +35,7 @@ public class TicketService {
     public TicketResponse createTicket(CreateTicketRequest request) {
 
         UserEntity createdBy = userRepository.findById(request.createdByUserID())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new TicketNotFoundException("User not found"));
 
         TicketEntity ticket = new TicketEntity(
                 request.title(),
@@ -46,13 +50,15 @@ public class TicketService {
 
     public TicketResponse getTicketById(UUID id) {
 
+
         TicketEntity ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found"));
 
         return mapToResponse(ticket);
     }
 
     public List<TicketResponse> getAllTickets() {
+
 
         return ticketRepository.findAll()
                 .stream()
@@ -60,6 +66,23 @@ public class TicketService {
                 .toList();
     }
 
+    
+    public TicketResponse updateTicket(UUID ticketid, UpdateTicketRequest request) {
+    	
+    	TicketEntity ticket = ticketRepository.findById(ticketid)
+    	.orElseThrow(() -> new TicketNotFoundException("Ticket not found"));
+    	
+    	ticket.updateDetails(request.title(),
+    			request.description(),
+    			request.priority(),
+    			request.category(),
+    			request.status());
+    	
+		return mapToResponse(ticket);
+    	
+    }
+    
+   
     private TicketResponse mapToResponse(TicketEntity ticket) {
 
         return new TicketResponse(
@@ -78,4 +101,23 @@ public class TicketService {
                 ticket.getUpdatedAt()
         );
     }
+    
+    public TicketResponse assignTicket(
+    		UUID ticketId, AssignTicketRequest request) {
+    	
+    	TicketEntity ticket = ticketRepository.findById(ticketId)
+    			.orElseThrow(() -> new TicketNotFoundException("Ticket not found: " +ticketId));
+    	
+    	UserEntity assignedTo = userRepository.findById(request.assignToUserId())
+    			.orElseThrow(() -> new UserNotFoundException("User not found: " +request.assignToUserId()));
+    	
+    	ticket.assignTo(assignedTo);
+    	
+    	return mapToResponse(ticket);
+    	
+    }
+    
+    
+    
+    
 }
