@@ -15,7 +15,7 @@ public record CreateTicketRequest(
 	@NotBlank(message = "Description is required")
 	String description,
 	
-	@NotNull(message = "CreatedByUserid is required for day 2 testing")
+	@NotNull(message = "CreatedByUserid is required ")
 	UUID createdByUserID
 	) {
 }

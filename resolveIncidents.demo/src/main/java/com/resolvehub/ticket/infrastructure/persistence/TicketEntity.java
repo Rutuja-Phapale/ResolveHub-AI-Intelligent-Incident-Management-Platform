@@ -169,4 +169,18 @@ public class TicketEntity {
     public void changeCategory(TicketCategory category) {
         this.category = category;
     }
+    
+    public void updateDetails(
+            String title,
+            String description,
+            TicketPriority priority,
+            TicketCategory category,
+            TicketStatus status) {
+
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.category = category;
+        this.status = status;
+    }
 }
